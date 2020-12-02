@@ -11,9 +11,32 @@
     <p>Hello <%- currentUser.full_name; %>!</p>
 
     <h2>Organisations</h2>
-    <% currentUser.organization_memberships.forEach(function(membership) { %>
-      <p><%- membership.organization.name; %></p>
-    <% }); %>
+
+    <div class="d-flex justify-content-center align-items-stretch flex-wrap">
+
+      <% currentUser.organization_memberships.forEach(function(membership) { %>
+        <div class="card" style="flex-basis: calc(25% - 10px);margin:5px">
+          <% if (membership.organization.logo_url) { %>
+            <img class="card-img-top" src="<%- membership.organization.logo_url; %>" alt="Card image cap">
+          <% } %>
+          <div class="card-body">
+            <h5 class="card-title"><%- membership.organization.name; %></h5>
+            <p class="card-text"><%- membership.organization.kinds.join(", "); %></p>
+
+            <% if (membership.organization.connected) { %>
+              <span class="badge badge-success">Connected</span>
+            <% } else { %>
+              <% if (membership.roles.includes('admin') || membership.roles.includes('owner')) { %>
+                <a href="#" class="btn btn-primary">Install app</a>
+              <% } else { %>
+                <div class="alert alert-warning" role="alert">Only admins can install an app</div>
+              <% } %>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+
+    </div>
 
     <a href="/logout">Logout</a>
   </div>
