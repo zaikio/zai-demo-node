@@ -72,6 +72,18 @@ app.get("/", async (req, res) => {
   res.end();
 });
 
+app.get("/install", async (req, res) => {
+  await getAccessToken(req, res);
+
+  res.redirect(
+    OAUTH_CLIENT.authorizeURL({
+      redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
+      scope: `Org/${req.query.organization_id}.directory.organization.r`,
+    })
+  );
+  res.end();
+});
+
 app.get("/current_person.json", async (req, res) => {
   await getAccessToken(req);
 
@@ -92,6 +104,18 @@ app.get("/oauth/callback", async (req, res) => {
       scope: "directory.person.r",
     });
     req.session.zai_access_token = JSON.stringify(accessToken.toJSON());
+  } catch (error) {
+    console.log("Access Token Error", error.message);
+  }
+  res.redirect("/");
+});
+
+app.get("/oauth/org-callback", async (req, res) => {
+  try {
+    const accessToken = await OAUTH_CLIENT.getToken({
+      code: req.query.code,
+      redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
+    });
   } catch (error) {
     console.log("Access Token Error", error.message);
   }

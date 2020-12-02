@@ -27,7 +27,7 @@
               <span class="badge badge-success">Connected</span>
             <% } else { %>
               <% if (membership.roles.includes('admin') || membership.roles.includes('owner')) { %>
-                <a href="#" class="btn btn-primary">Install app</a>
+                <a href="/install?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Install app</a>
               <% } else { %>
                 <div class="alert alert-warning" role="alert">Only admins can install an app</div>
               <% } %>
