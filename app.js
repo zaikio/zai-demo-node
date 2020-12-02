@@ -25,9 +25,6 @@ app
   .use(
     session({
       secret: process.env.SESSION_KEY,
-      cookie: {
-        secure: process.env.HUB_OAUTH_REDIRECT_URL.startsWith("https://"),
-      },
     })
   )
   .listen(PORT, () => {
