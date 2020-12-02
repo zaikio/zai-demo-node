@@ -21,8 +21,11 @@
   },
   "homepage": "https://github.com/crispymtn/zai-demo-node#readme",
   "dependencies": {
+    "axios": "^0.21.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "simple-oauth2": "^4.2.0"
   }
 }

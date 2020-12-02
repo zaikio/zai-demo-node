@@ -15,7 +15,9 @@ $ cp .env.example .env
 ```
 
 It is important that you add your URL to the `Redirect URLs` in Directory.
-For this test project you need to add `http://localhost:8080`
+For this test project you need to add `http://localhost:8080/oauth/callback` and `=http://localhost:8080/oauth/org-callback`.
+
+You need to add the following desired scopes: `directory.person.r`, `directory.organization.r`.
 
 Install the dependencies and run the dev server.
 

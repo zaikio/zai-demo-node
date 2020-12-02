@@ -2,9 +2,46 @@
 <html>
 <head>
   <%- include('../partials/header.ejs') %>
+  <script src="https://launchpad.zaikio.com/launchpad.js"></script>
 </head>
 
 <body>
-  <div class="container">Hello world</div>
+  <div id="zai-launchpad"></div>
+  <div class="container" style="padding-top: 50px">
+    <p>Hello <%- currentUser.full_name; %>!</p>
+
+    <h2>Organisations</h2>
+    <% currentUser.organization_memberships.forEach(function(membership) { %>
+      <p><%- membership.organization.name; %></p>
+    <% }); %>
+
+    <a href="/logout">Logout</a>
+  </div>
+  <script>
+  if (window.zaiLaunchpad) {
+    window.zaiLaunchpad.setup({
+      loadPersonData: () => {
+        return fetch('/current_person.json').then(response => response.json());
+      },
+      directoryHost: '<%- host; %>', // optional host, you can specify the sandbox for your test environment
+      activeOrganizationId: null, // The currently active organization or null if the user is selected
+      activeAppName: 'demo_nodejs', // The currently active app, so the name of your app
+      onSelectOrganization: organization => {
+        if (organization) {
+          // your code
+        } else {
+          // Person was selected
+          // your code
+        }
+      },
+      helpMenu: [
+        {
+          label: 'Developer Hub',
+          url: 'https://docs.zaikio.com/',
+        },
+      ]
+    });
+    }
+  </script>
 </body>
 </html>
