@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  <div id="zai-launchpad"></div>
+  <%- include('../partials/launchpad.ejs', { organizationId: null, host: host }) %>
   <div class="container" style="padding-top: 50px">
     <p>Hello <%- currentUser.full_name; %>!</p>
 
@@ -20,11 +20,15 @@
             <img class="card-img-top" src="<%- membership.organization.logo_url; %>" alt="Card image cap">
           <% } %>
           <div class="card-body">
-            <h5 class="card-title"><%- membership.organization.name; %></h5>
+            <h5 class="card-title">
+              <%- membership.organization.name; %>
+              <% if (membership.organization.connected) { %>
+                <span class="badge badge-success">Connected</span>
+              <% } %>
+            </h5>
             <p class="card-text"><%- membership.organization.kinds.join(", "); %></p>
-
             <% if (membership.organization.connected) { %>
-              <span class="badge badge-success">Connected</span>
+              <a href="/organization?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Open dashboard</a>
             <% } else { %>
               <% if (membership.roles.includes('admin') || membership.roles.includes('owner')) { %>
                 <a href="/install?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Install app</a>
@@ -40,31 +44,5 @@
 
     <a href="/logout">Logout</a>
   </div>
-  <script>
-  if (window.zaiLaunchpad) {
-    window.zaiLaunchpad.setup({
-      loadPersonData: () => {
-        return fetch('/current_person.json').then(response => response.json());
-      },
-      directoryHost: '<%- host; %>', // optional host, you can specify the sandbox for your test environment
-      activeOrganizationId: null, // The currently active organization or null if the user is selected
-      activeAppName: 'demo_nodejs', // The currently active app, so the name of your app
-      onSelectOrganization: organization => {
-        if (organization) {
-          // your code
-        } else {
-          // Person was selected
-          // your code
-        }
-      },
-      helpMenu: [
-        {
-          label: 'Developer Hub',
-          url: 'https://docs.zaikio.com/',
-        },
-      ]
-    });
-    }
-  </script>
 </body>
 </html>

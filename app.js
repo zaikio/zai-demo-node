@@ -84,6 +84,20 @@ app.get("/install", async (req, res) => {
   res.end();
 });
 
+app.get("/organization", async (req, res) => {
+  await getAccessToken(req, res);
+
+  res.render("pages/organization", {
+    membership: (
+      await axios.get(process.env.ZAIKIO_HUB_HOST + "/api/v1/person.json")
+    ).data.organization_memberships.find(
+      (m) => m.organization.id === req.query.organization_id
+    ),
+    host: process.env.ZAIKIO_HUB_HOST,
+  });
+  res.end();
+});
+
 app.get("/current_person.json", async (req, res) => {
   await getAccessToken(req);
 

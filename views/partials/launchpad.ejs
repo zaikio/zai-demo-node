@@ -1,0 +1,27 @@
+<div id="zai-launchpad"></div>
+
+<script>
+if (window.zaiLaunchpad) {
+  window.zaiLaunchpad.setup({
+    loadPersonData: () => {
+      return fetch('/current_person.json').then(response => response.json());
+    },
+    directoryHost: '<%- host; %>', // optional host, you can specify the sandbox for your test environment
+    activeOrganizationId: <%- organizationId ? `'${organizationId}'` : 'null'; %>, // The currently active organization or null if the user is selected
+    activeAppName: 'demo_nodejs', // The currently active app, so the name of your app
+    onSelectOrganization: organization => {
+      if (organization) {
+        window.location.href = "/organization?organization_id=" + organization.id;
+      } else {
+        window.location.href = "/";
+      }
+    },
+    helpMenu: [
+      {
+        label: 'Developer Hub',
+        url: 'https://docs.zaikio.com/',
+      },
+    ]
+  });
+  }
+</script>
