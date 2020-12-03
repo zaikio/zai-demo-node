@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8080;
 const { AuthorizationCode, AccessToken } = require("simple-oauth2");
 require("dotenv").config();
 
+// Setup OAuth Client
 const OAUTH_CLIENT = new AuthorizationCode({
   client: {
     id: process.env.HUB_OAUTH_CLIENT_ID,
@@ -38,6 +39,7 @@ async function getAccessToken(req, res) {
     );
 
     try {
+      // Refresh token if needed
       if (accessToken.expired()) {
         accessToken = await accessToken.refresh();
         req.session.zai_access_token = JSON.stringify(accessToken.toJSON());
@@ -49,6 +51,7 @@ async function getAccessToken(req, res) {
     axios.defaults.headers.common["Authorization"] =
       "Bearer " + accessToken.token.access_token;
   } else {
+    // Redirect to Zaikio SSO
     res.redirect(
       OAUTH_CLIENT.authorizeURL({
         redirect_uri: process.env.HUB_OAUTH_REDIRECT_URL,
@@ -75,6 +78,7 @@ app.get("/", async (req, res) => {
 app.get("/install", async (req, res) => {
   await getAccessToken(req, res);
 
+  // Redirect to Zaikio SSO for organization
   res.redirect(
     OAUTH_CLIENT.authorizeURL({
       redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
@@ -112,11 +116,13 @@ app.get("/current_person.json", async (req, res) => {
 
 app.get("/oauth/callback", async (req, res) => {
   try {
+    // Request access token from zaikio
     const accessToken = await OAUTH_CLIENT.getToken({
       code: req.query.code,
       redirect_uri: process.env.HUB_OAUTH_REDIRECT_URL,
       scope: "directory.person.r",
     });
+    // Store access token in session
     req.session.zai_access_token = JSON.stringify(accessToken.toJSON());
   } catch (error) {
     console.log("Access Token Error", error.message);
@@ -126,6 +132,7 @@ app.get("/oauth/callback", async (req, res) => {
 
 app.get("/oauth/org-callback", async (req, res) => {
   try {
+    // Request access token from zaikio to establish connection for the organization
     const accessToken = await OAUTH_CLIENT.getToken({
       code: req.query.code,
       redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
