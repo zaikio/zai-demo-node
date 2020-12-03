@@ -63,6 +63,13 @@ async function getAccessToken(req, res) {
 }
 
 app.get("/", async (req, res) => {
+  // Open organization dashboard if coming from launchpad
+  if (req.query.organization_id) {
+    res.redirect(`/organization?organization_id=${req.query.organization_id}`);
+    res.end();
+    return;
+  }
+
   await getAccessToken(req, res);
 
   res.render("pages/index", {
