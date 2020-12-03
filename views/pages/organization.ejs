@@ -10,28 +10,35 @@
   <div class="container" style="padding-top: 50px">
     <h1><%- membership.organization.name; %></h1>
 
-    <% if (membership.organization.logo_url) { %>
-      <img c src="<%- membership.organization.logo_url; %>" style="height:100px" alt="Card image cap">
-    <% } %>
-
     <div class="card">
-      <div class="card-body">
-        <h5 class="card-title"><%- membership.organization.name; %></h5>
-        <p class="card-text"><%- membership.organization.kinds.join(", "); %></p>
-
-        <% if (membership.organization.connected) { %>
-          <span class="badge badge-success">Connected</span>
-        <% } else { %>
-          <% if (membership.roles.includes('admin') || membership.roles.includes('owner')) { %>
-            <a href="/install?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Install app</a>
-          <% } else { %>
-            <div class="alert alert-warning" role="alert">Only admins can install an app</div>
+      <div class="card-body d-flex">
+        <div>
+          <% if (membership.organization.logo_url) { %>
+            <img class="card-img-top" src="<%- membership.organization.logo_url; %>" alt="<%- membership.organization.name; %>" style="width: 100px;margin-right:20px;">
           <% } %>
-        <% } %>
+        </div>
+
+        <div class="flex-grow-1 p-2">
+          <h5 class="card-title">
+            <%- membership.organization.name; %>
+            <% if (membership.organization.connected) { %>
+              <span class="badge badge-success">Connected</span>
+            <% } %>
+          </h5>
+          <p class="card-text"><%- membership.organization.kinds.join(", "); %></p>
+
+          <% if (!membership.organization.connected) { %>
+            <% if (membership.roles.includes('admin') || membership.roles.includes('owner')) { %>
+              <a href="/install?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Install Node Demo App</a>
+            <% } else { %>
+              <div class="alert alert-warning mb-0" role="alert">Only admins can install an app</div>
+            <% } %>
+          <% } %>
+        </div>
       </div>
     </div>
 
-    <a href="/">Back to Dashboard</a>
+    <div class="mt-4"><a href="/">Back to Dashboard</a></div>
   </div>
 </body>
 </html>
