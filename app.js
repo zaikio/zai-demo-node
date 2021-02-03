@@ -89,9 +89,12 @@ app.get("/install", async (req, res) => {
   res.redirect(
     OAUTH_CLIENT.authorizeURL({
       redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
-      scope: `Org/${req.query.organization_id}.directory.organization.r`,
+      scope: req.query.organization_id
+        ? `Org/${req.query.organization_id}.directory.organization.r`
+        : "Org.directory.organization.r",
     })
   );
+
   res.end();
 });
 
