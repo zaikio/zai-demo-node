@@ -2,11 +2,9 @@
 <html>
 <head>
   <%- include('../partials/header.ejs') %>
-  <script src="https://launchpad.zaikio.com/launchpad.js"></script>
 </head>
 
 <body>
-  <%- include('../partials/launchpad.ejs', { organizationId: null, host: host }) %>
   <div class="container" style="padding-top: 50px">
     <p>Hello <%- currentUser.full_name; %>!</p>
 

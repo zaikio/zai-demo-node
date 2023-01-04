@@ -63,7 +63,7 @@ async function getAccessToken(req, res) {
 }
 
 app.get("/", async (req, res) => {
-  // Open organization dashboard if coming from launchpad
+  // Open organization dashboard if coming from zaikio
   if (req.query.organization_id) {
     res.redirect(`/organization?organization_id=${req.query.organization_id}`);
     res.end();
