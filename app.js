@@ -50,6 +50,8 @@ async function getAccessToken(req, res) {
 
     axios.defaults.headers.common["Authorization"] =
       "Bearer " + accessToken.token.access_token;
+
+    return true;
   } else {
     // Redirect to Zaikio SSO
     res.redirect(
@@ -59,6 +61,8 @@ async function getAccessToken(req, res) {
       })
     );
     res.end();
+
+    return false;
   }
 }
 
@@ -70,7 +74,9 @@ app.get("/", async (req, res) => {
     return;
   }
 
-  await getAccessToken(req, res);
+  if (!(await getAccessToken(req, res))) {
+    return;
+  }
 
   res.render("pages/index", {
     currentUser: (
@@ -83,7 +89,9 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/install", async (req, res) => {
-  await getAccessToken(req, res);
+  if (!(await getAccessToken(req, res))) {
+    return;
+  }
 
   // Redirect to Zaikio SSO for organization
   res.redirect(
@@ -99,7 +107,9 @@ app.get("/install", async (req, res) => {
 });
 
 app.get("/organization", async (req, res) => {
-  await getAccessToken(req, res);
+  if (!(await getAccessToken(req, res))) {
+    return;
+  }
 
   res.render("pages/organization", {
     membership: (
@@ -113,7 +123,9 @@ app.get("/organization", async (req, res) => {
 });
 
 app.get("/current_person.json", async (req, res) => {
-  await getAccessToken(req);
+  if (!(await getAccessToken(req, res))) {
+    return;
+  }
 
   res.setHeader("Content-Type", "application/json");
   res.end(
