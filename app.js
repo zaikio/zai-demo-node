@@ -57,7 +57,7 @@ async function getAccessToken(req, res) {
     res.redirect(
       OAUTH_CLIENT.authorizeURL({
         redirect_uri: process.env.HUB_OAUTH_REDIRECT_URL,
-        scope: "directory.person.r",
+        scope: "zaikio.person.r",
       })
     );
     res.end();
@@ -98,8 +98,8 @@ app.get("/install", async (req, res) => {
     OAUTH_CLIENT.authorizeURL({
       redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
       scope: req.query.organization_id
-        ? `Org/${req.query.organization_id}.directory.organization.r`
-        : "Org.directory.organization.r",
+        ? `Org/${req.query.organization_id}.zaikio.organization.r`
+        : "Org.zaikio.organization.r",
     })
   );
 
@@ -142,7 +142,7 @@ app.get("/oauth/callback", async (req, res) => {
     const accessToken = await OAUTH_CLIENT.getToken({
       code: req.query.code,
       redirect_uri: process.env.HUB_OAUTH_REDIRECT_URL,
-      scope: "directory.person.r",
+      scope: "zaikio.person.r",
     });
     // Store access token in session
     req.session.zai_access_token = JSON.stringify(accessToken.toJSON());
