@@ -177,6 +177,7 @@ app.get("/logout", (req, res) => {
   res.render("pages/logout");
 });
 
+// Parse information from the html post form
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/create_zaikio_order", async (req, res) => {
@@ -204,7 +205,7 @@ app.post("/create_zaikio_order", async (req, res) => {
     req.session.message = { type: '', text: `Order with ID=${response.data.id} been successfully created`};
     res.redirect(referer);
   } catch (error) {
-      req.session.message = { type: 'Request error', text: error.response.data.errors};
-      res.redirect(referer);
+    req.session.message = { type: 'Request error', text: error.response.data.errors};
+    res.redirect(referer);
   }
 });
