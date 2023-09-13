@@ -33,9 +33,29 @@
             <% } %>
           <% } %>
         </div>
+
+        <div>
+          <a href="/install?organization_id=<%- membership.organization.id; %>" class="btn btn-primary">Reconnect</a>
+        </div>
       </div>
     </div>
 
+    <div class="mt-4 d-flex flex-column">
+      <h4>Create Zaikio Order</h4>
+      <div class="message-container" style="padding-top: 10px;">
+        <% if (message) { %>
+          <p id="message" class="<%= message.type %>"><%= message.text %></p>
+        <% } %>
+      </div>
+      <form id="orderForm" class="rounded d-flex flex-column" method="POST" action="/create_zaikio_order">
+        <input type="hidden" name="organizationId" value="<%- membership.organization.id; %>">
+        <label for="orderNumber">Order Number:</label>
+        <input type="text" id="orderNumber" name="orderNumber" placeholder="BKF19U" style="margin-bottom: 10px;">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" placeholder="5000" style="margin-bottom: 20px;">
+        <button type="submit" id="zaikioOrderCreate" class="btn btn-success">Create</button>
+      </form>
+    </div>
     <div class="mt-4"><a href="/">Back to Dashboard</a></div>
   </div>
 </body>
