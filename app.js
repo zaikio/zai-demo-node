@@ -194,18 +194,22 @@ app.post("/create_zaikio_order", async (req, res) => {
     accessToken = await client.getToken({ scope: `Org/${organizationId}.zaikio.orders.rw,Org/${organizationId}.zaikio.jobs.rw` });
   } catch (error) {
     console.error('Access Token error', error.message);
+    req.session.message = { type: 'Access Token error', text: error.message};
+    res.redirect(referer);
   }
 
-  try {
-    const payload = postZaikioOrderRequestParams(Number(quantity), String(orderNumber));
-    const response = await axios.post(process.env.DATA_PLATFORM_HOST + "/api/v1/orders", payload,
-    {
-      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + accessToken.token.access_token}
-    });
-    req.session.message = { type: '', text: `Order with ID=${response.data.id} been successfully created`};
-    res.redirect(referer);
-  } catch (error) {
-    req.session.message = { type: 'Request error', text: error.response.data.errors};
-    res.redirect(referer);
+  if (accessToken) {
+    try {
+      const payload = postZaikioOrderRequestParams(Number(quantity), String(orderNumber));
+      const response = await axios.post(process.env.DATA_PLATFORM_HOST + "/api/v1/orders", payload,
+      {
+        headers: {"Content-Type": "application/json", "Authorization": "Bearer " + accessToken.token.access_token}
+      });
+      req.session.message = { type: '', text: `Order with ID=${response.data.id} been successfully created`};
+      res.redirect(referer);
+    } catch (error) {
+      req.session.message = { type: 'Request error', text: error.message};
+      res.redirect(referer);
+    }
   }
 });
