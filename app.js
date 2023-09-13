@@ -4,11 +4,12 @@ const session = require("express-session");
 const path = require("path");
 const axios = require("axios");
 const PORT = process.env.PORT || 8080;
-const { AuthorizationCode, AccessToken } = require("simple-oauth2");
+const { AuthorizationCode, ClientCredentials } = require("simple-oauth2");
 require("dotenv").config();
+const postZaikioOrderRequestParams = require('./payload');
 
 // Setup OAuth Client
-const OAUTH_CLIENT = new AuthorizationCode({
+const OAUTH_CLIENT_CONFIG = {
   client: {
     id: process.env.HUB_OAUTH_CLIENT_ID,
     secret: process.env.HUB_OAUTH_CLIENT_SECRET,
@@ -18,7 +19,9 @@ const OAUTH_CLIENT = new AuthorizationCode({
     tokenPath: "/oauth/access_token",
     revokePath: "/api/v1/revoked_access_tokens",
   },
-});
+};
+
+const OAUTH_CLIENT = new AuthorizationCode(OAUTH_CLIENT_CONFIG);
 
 app
   .set("views", path.join(__dirname, "views"))
@@ -98,8 +101,8 @@ app.get("/install", async (req, res) => {
     OAUTH_CLIENT.authorizeURL({
       redirect_uri: process.env.HUB_OAUTH_ORG_REDIRECT_URL,
       scope: req.query.organization_id
-        ? `Org/${req.query.organization_id}.zaikio.organization.r`
-        : "Org.zaikio.organization.r",
+        ? `Org/${req.query.organization_id}.zaikio.organization.r,Org/${req.query.organization_id}.zaikio.orders.rw,Org/${req.query.organization_id}.zaikio.jobs.rw`
+        : "Org.zaikio.organization.r,Org.zaikio.orders.rw,Org.zaikio.jobs.rw",
     })
   );
 
@@ -111,7 +114,11 @@ app.get("/organization", async (req, res) => {
     return;
   }
 
+  const message = req.session.message;
+  req.session.message = null;
+
   res.render("pages/organization", {
+    message,
     membership: (
       await axios.get(process.env.ZAIKIO_HUB_HOST + "/api/v1/person.json")
     ).data.organization_memberships.find(
@@ -168,4 +175,36 @@ app.get("/oauth/org-callback", async (req, res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("pages/logout");
+});
+
+app.use(express.urlencoded({ extended: true }));
+
+app.post("/create_zaikio_order", async (req, res) => {
+  if (!(await getAccessToken(req, res))) {
+    return;
+  }
+
+  const { organizationId, orderNumber, quantity } = req.body;
+  const referer = req.headers.referer;
+  const client = new ClientCredentials(OAUTH_CLIENT_CONFIG);
+  let accessToken;
+
+  try {
+    accessToken = await client.getToken({ scope: `Org/${organizationId}.zaikio.orders.rw,Org/${organizationId}.zaikio.jobs.rw` });
+  } catch (error) {
+    console.error('Access Token error', error.message);
+  }
+
+  try {
+    const payload = postZaikioOrderRequestParams(Number(quantity), String(orderNumber));
+    const response = await axios.post(process.env.DATA_PLATFORM_HOST + "/api/v1/orders", payload,
+    {
+      headers: {"Content-Type": "application/json", "Authorization": "Bearer " + accessToken.token.access_token}
+    });
+    req.session.message = { type: '', text: `Order with ID=${response.data.id} been successfully created`};
+    res.redirect(referer);
+  } catch (error) {
+      req.session.message = { type: 'Request error', text: error.response.data.errors};
+      res.redirect(referer);
+  }
 });
